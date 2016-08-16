@@ -29,6 +29,7 @@ const NewProduct = React.createClass({
     return (
       <div>
         <h1>Store Product Organizer</h1>
+        <h4>Total Products is {this.props.totalProds}, Total Value is {this.props.totalPrice}.</h4>
         <div>
           <span>Produce Name: </span><input type="text" id="inputText" value={this.state.name} onChange={this.onInputNameChange}/>
           <span>Produce Price: </span><input type="text" id="inputText" value={this.state.Price} onChange={this.onInputPriceChange}/>
@@ -84,7 +85,9 @@ const StoreBoard = React.createClass({
     }catch(err){
       var storeProds =[];
     }
-    return {storeProds};
+    return {
+      storeProds
+    };
   },
   componentDidUpdate(){
     localStorage.storeProds = JSON.stringify(this.state.storeProds);
@@ -129,10 +132,25 @@ const StoreBoard = React.createClass({
     });
     this.setState({storeProds: newProdArr});
   },
+  totalProds(){
+    let productArr = this.state.storeProds;
+    let totalProducts = productArr.length;
+    return totalProducts;
+  },
+  totalPrice(){
+    let productArr = this.state.storeProds;
+    let sum = 0;
+    productArr.forEach(product=>{
+      return sum += +product.price ;
+    });
+    return sum;
+  },
   render(){
+    const totalProds = this.totalProds();
+    const totalPrice = this.totalPrice();
     return(
       <div>
-        <NewProduct addProd = {this.addProd}/>
+        <NewProduct addProd = {this.addProd}  totalProds={totalProds}   totalPrice={totalPrice}/>
         <ProdList storeProds ={this.state.storeProds} removeProd={this.removeProd} prodSortByName={this.prodSortByName} prodSortByPrice={this.prodSortByPrice}
           prodSortByName_ascending = {this.prodSortByName_ascending} prodSortByPrice_ascending={this.prodSortByPrice_ascending}/>
       </div>
