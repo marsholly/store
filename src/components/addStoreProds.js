@@ -62,8 +62,8 @@ const ProdList = React.createClass({
       <table className="table table-striped">
         <thead>
           <tr>
-            <th onClick={this.props.prodSortByName}>Name</th>
-            <th onClick={this.props.prodSortByPrice}>Price</th>
+            <th onClick={this.props.prodSortByName} onDoubleClick={this.props.prodSortByName_ascending}>Name</th>
+            <th onClick={this.props.prodSortByPrice} onDoubleClick={this.props.prodSortByPrice_ascending}>Price</th>
             <th>description</th>
             <th>Delete</th>
             <th>Edit</th>
@@ -115,11 +115,26 @@ const StoreBoard = React.createClass({
     });
     this.setState({storeProds: newProdArr});
   },
+  prodSortByName_ascending(){
+    let productArr = this.state.storeProds;
+    let newProdArr = productArr.sort((a,b)=>{
+      return (a.name < b.name)? 1 : ((b.name < a.name)? -1 : 0);
+    });
+    this.setState({storeProds: newProdArr});
+  },
+  prodSortByPrice_ascending(){
+    let productArr = this.state.storeProds;
+    let newProdArr = productArr.sort((a,b)=>{
+      return (b.price - a.price);
+    });
+    this.setState({storeProds: newProdArr});
+  },
   render(){
     return(
       <div>
         <NewProduct addProd = {this.addProd}/>
-        <ProdList storeProds ={this.state.storeProds} removeProd={this.removeProd} prodSortByName={this.prodSortByName} prodSortByPrice={this.prodSortByPrice}/>
+        <ProdList storeProds ={this.state.storeProds} removeProd={this.removeProd} prodSortByName={this.prodSortByName} prodSortByPrice={this.prodSortByPrice}
+          prodSortByName_ascending = {this.prodSortByName_ascending} prodSortByPrice_ascending={this.prodSortByPrice_ascending}/>
       </div>
     )
   }

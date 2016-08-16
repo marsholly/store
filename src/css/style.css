@@ -1,3 +1,6 @@
-table, th, td{
-  border: 1px solid blue;
+.modal-container {
+  position: relative;
+}
+.modal-container .modal, .modal-container .modal-backdrop {
+  position: absolute;
 }
