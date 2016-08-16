@@ -1,22 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import uuid from 'uuid';
-import EditProd from './editProd';
 
 const NewProduct = React.createClass({
   getInitialState(){
     return{
       name:'',
       price: 0,
-      quantity: 0
+      description: ''
     }
   },
   addProdInfos(){
     let name = this.state.name;
     let price = this.state.price;
-    let quantity = this.state.quantity;
-    this.props.addProd(name, price, quantity);
-    this.setState({name:'', price: 0 , quantity: 0});
+    let description = this.state.description;
+    this.props.addProd(name, price, description);
+    this.setState({name:'', price: 0 , description: ''});
   },
   onInputNameChange(event){
     this.setState({name: event.target.value})
@@ -24,8 +22,8 @@ const NewProduct = React.createClass({
   onInputPriceChange(event){
     this.setState({price: event.target.value})
   },
-  onInputQuantityChange(event){
-    this.setState({quantity: event.target.value})
+  onInputChange(event){
+    this.setState({description: event.target.value})
   },
   render(){
     return (
@@ -34,7 +32,7 @@ const NewProduct = React.createClass({
         <div>
           <span>Produce Name: </span><input type="text" id="inputText" value={this.state.name} onChange={this.onInputNameChange}/>
           <span>Produce Price: </span><input type="text" id="inputText" value={this.state.Price} onChange={this.onInputPriceChange}/>
-          <span>Produce Quantity: </span><input type="text" id="inputText" value={this.state.quantity} onChange={this.onInputQuantityChange}/>
+          <span>Produce description: </span><input type="text" id="inputText" value={this.state.description} onChange={this.onInputChange}/>
           <button className='btn btn-primary' onClick={this.addProdInfos}>Add Product</button>
         </div>
       </div>
@@ -43,17 +41,14 @@ const NewProduct = React.createClass({
 })
 
 const Product = React.createClass({
-  editProd(){
-    <EditProd id={this.props.id} name={this.props.name} price={this.props.price} quantity={this.props.quantity}/>
-  },
   render(){
     return(
     <tr key={this.props.id}>
       <td>{this.props.name}</td>
       <td>{this.props.price}</td>
-      <td>{this.props.quantity}</td>
+      <td>{this.props.description}</td>
       <td><button className='btn btn-danger' onClick={()=>this.props.removeProd(this.props.id)}>Delete</button></td>
-      <td><button className='btn btn-success' onClick={this.editProd}>Edit</button></td>
+      <td><button type="button" className="btn btn-success">Edit</button></td>
     </tr>)
   }
 })
@@ -61,15 +56,15 @@ const Product = React.createClass({
 const ProdList = React.createClass({
   render(){
     let products = this.props.storeProds.map(product=>{
-      return <Product key={product.id} name={product.name} id={product.id} price ={product.price} quantity = {product.quantity} removeProd={this.props.removeProd}/>
+      return <Product key={product.id} name={product.name} id={product.id} price ={product.price} description = {product.description} removeProd={this.props.removeProd}/>
     });
     return(
       <table className="table table-striped">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
+            <th onClick={this.props.prodSortByName}>Name</th>
+            <th onClick={this.props.prodSortByPrice}>Price</th>
+            <th>description</th>
             <th>Delete</th>
             <th>Edit</th>
           </tr>
@@ -79,7 +74,6 @@ const ProdList = React.createClass({
         </tbody>
       </table>
     )
-  //  console.log(id);
   }
 })
 
@@ -95,23 +89,37 @@ const StoreBoard = React.createClass({
   componentDidUpdate(){
     localStorage.storeProds = JSON.stringify(this.state.storeProds);
   },
-  addProd(name, price, quantity){
+  addProd(name, price, description){
     let product = {};
     product.name = name;
     product.id = uuid();
     product.price = price;
-    product.quantity = quantity;
+    product.description = description;
     this.setState({ storeProds: this.state.storeProds.concat(product) })
   },
   removeProd: function(id){
     this.setState({storeProds: this.state.storeProds.filter(s => s.id !== id)
     });
   },
+  prodSortByName(){
+    let productArr = this.state.storeProds;
+    let newProdArr = productArr.sort((a,b)=>{
+      return (a.name > b.name)? 1 : ((b.name > a.name)? -1 : 0);
+    });
+    this.setState({storeProds: newProdArr});
+  },
+  prodSortByPrice(){
+    let productArr = this.state.storeProds;
+    let newProdArr = productArr.sort((a,b)=>{
+      return (a.price - b.price);
+    });
+    this.setState({storeProds: newProdArr});
+  },
   render(){
     return(
       <div>
         <NewProduct addProd = {this.addProd}/>
-        <ProdList storeProds ={this.state.storeProds} removeProd={this.removeProd}/>
+        <ProdList storeProds ={this.state.storeProds} removeProd={this.removeProd} prodSortByName={this.prodSortByName} prodSortByPrice={this.prodSortByPrice}/>
       </div>
     )
   }
